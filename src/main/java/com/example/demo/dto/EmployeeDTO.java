@@ -14,5 +14,4 @@ public class EmployeeDTO {
 
     private double salary;
 
-
 }

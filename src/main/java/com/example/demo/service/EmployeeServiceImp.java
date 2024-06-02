@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,9 @@ public class EmployeeServiceImp implements EmployeeService {
         this.mapper = mapper;
     }
 
+
     @Override
+    @Transactional
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
         Employee employee = mapper.dtoToEntity(employeeDTO);
         Employee employeeSaved = employeeRepository.save(employee);
@@ -31,26 +34,32 @@ public class EmployeeServiceImp implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EmployeeDTO getEmployee(Long id) {
         return mapper.entityToDTO(getEmployeeIfExistOrTrowException(id));
     }
 
+
     @Override
+    @Transactional
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
         Employee employee = getEmployeeIfExistOrTrowException(id);
             employee.setName(employeeDTO.getName());
-            employee.setDepartment(employee.getDepartment());
-            employee.setSalary(employee.getSalary());
+            employee.setDepartment(employeeDTO.getDepartment());
+            employee.setSalary(employeeDTO.getSalary());
             Employee updatedEmployee = employeeRepository.save(employee);
             return mapper.entityToDTO(updatedEmployee);
     }
 
+
     @Override
+    @Transactional
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EmployeeDTO> getAllEmployee(Pageable pageable) {
         List<Employee> all =  employeeRepository.findAll(PageRequest.of(
                 pageable.getPageNumber(),
